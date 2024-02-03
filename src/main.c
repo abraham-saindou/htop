@@ -5,21 +5,22 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "time.h"
-#include "backend/Data_getter.c"
-
+#include "backend/Data_getter.h"
+#include "frontend/gui.h"
 
 
 int main(){
-    int pid = get_pid();
-    printf("Process ID = %d\n", pid);
-    get_processes();
-//    char ch;
-//    initscr();
-//
-//    while(ch == getch() != '\n'){
-//        printw("You've pressed %c\n",ch);
-//        refresh();
-//    }
-//    endwin();
+    ProcessInfo *processList;
+    int numProc;
+
+    get_processes(&processList, &numProc);
+    for (int i = 0; i < numProc; ++i) {
+        printf("Process Name: %s, PID: %d\n", processList[i].name, processList[i].pid);
+    }
+
+    display(processList, numProc);
+
+    free(processList);
+
     return 0;
 }

@@ -12,45 +12,41 @@
 
 #include "Data_getter.h"
 
-int get_processes(){
+void get_processes(ProcessInfo **procList, int *numProc){
     DIR* process_dir = opendir("/proc");
     if(!process_dir){
         perror("opendir");
-        return 1;
     }
-
     struct dirent* entry;
+    *numProc = 0;
+    *procList = NULL;
+
     while ((entry = readdir(process_dir)) != NULL){
         if (entry->d_type == DT_DIR && atoi(entry->d_name) != 0){
+            int pid = atoi(entry->d_name);
             char cmdline_path[300];
-            snprintf(cmdline_path, sizeof(cmdline_path), "/proc/%s/cmdline", entry->d_name);
+
+            snprintf(cmdline_path, sizeof(cmdline_path), "/proc/%d/cmdline", pid);
 
             FILE *cmdline_file = fopen(cmdline_path, "r");
-
-            if (cmdline_file){
-                char cmdline[300];
-                if(fgets(cmdline, sizeof(cmdline), cmdline_file)){
-                    printf("Process Name : %s\n",cmdline);
-                }
-                else{
-                    perror("fgets");
-                }
-                fclose(cmdline_file);
+            if (cmdline_file == NULL){
+                perror("Error opening cmdline file");
+                exit(EXIT_FAILURE);
             }
+
+            char procName[MAX_PROC_NAME_LEN];
+            fgets(procName, sizeof(procName), cmdline_file);
+            procName[strcspn(procName, "\n")] = '\0';
+
+            fclose(cmdline_file);
+
+            *procList = realloc(*procList, (*numProc + 1) * sizeof(ProcessInfo));
+            strcpy((*procList)[*numProc].name, procName);
+            (*procList)[*numProc].pid = pid;
+            (*numProc)++;
+
         }
     }
-
-    return 0;
-};
-
-int get_pid(){
-    int PID = getpid();
-
-    return PID;
-}
-
-int get_ppid(){
-    int PPID = getppid();
-    return PPID;
+    closedir(process_dir);
 }
 

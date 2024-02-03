@@ -5,7 +5,8 @@ set(CMAKE_C_STANDARD 17)
 
 add_executable(htop
         src/main.c
-        src/memleak.c
-        src/backend/Data_getter.h
         src/backend/Data_getter.c
-        src/frontend/gui.c)
+        src/frontend/gui.c
+        )
+
+target_link_libraries(htop PRIVATE -lncurses)

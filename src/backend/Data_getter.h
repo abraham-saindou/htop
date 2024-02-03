@@ -4,13 +4,15 @@
 
 #ifndef HTOP_DATA_GETTER_H
 #define HTOP_DATA_GETTER_H
+#define MAX_PROC_NAME_LEN 300
 
-int get_pid();
-int get_ppid();
+typedef struct {
+    char name[MAX_PROC_NAME_LEN];
+    int pid;
+}ProcessInfo;
 
-int get_processes();
 
-void set_pid();
-void set_ppid();
+static void get_processes(ProcessInfo **procList, int *numProc);
+
 
 #endif //HTOP_DATA_GETTER_H
